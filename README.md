@@ -1,4 +1,4 @@
-# CMG Memory — Contextual Memory Gradient
+# CMG Memory , Contextual Memory Gradient
 
 **Persistent, portable, user-owned memory for any LLM.**
 
@@ -10,28 +10,28 @@ Works with OpenAI · Anthropic Claude · Ollama · HuggingFace · Pinecone · lo
 
 ## Why CMG?
 
-Every major AI provider is building memory — but only for their own platform. Your memories in ChatGPT cannot move to Claude. Your context in Claude cannot reach a local Llama model. They have no incentive to build portability because lock-in is the business model.
+Every major AI provider is building memory , but only for their own platform. Your memories in ChatGPT cannot move to Claude. Your context in Claude cannot reach a local Llama model. They have no incentive to build portability because lock-in is the business model.
 
 CMG is the memory layer that lives outside any provider. You own the store. You choose the model. Your memories follow you across every AI tool you use.
 
 Three things no provider will build:
 
-- **Cross-provider portability** — one memory store works with GPT-4o on Monday, Claude on Tuesday, local Llama on Wednesday
-- **Local-first privacy** — JSON store + Ollama means zero data leaves your machine
-- **Intelligent forgetting** — memories decay, deduplicate, and promote through layers automatically, unlike platform memory that accumulates everything forever
+- **Cross-provider portability** , one memory store works with GPT-4o on Monday, Claude on Tuesday, local Llama on Wednesday
+- **Local-first privacy** , JSON store + Ollama means zero data leaves your machine
+- **Intelligent forgetting** , memories decay, deduplicate, and promote through layers automatically, unlike platform memory that accumulates everything forever
 
 ---
 
 ## How it works
 
-CMG implements a **four-layer memory gradient** that mirrors how human memory actually works — not a flat key-value store, but a hierarchy where important facts rise and trivial ones fade.
+CMG implements a **four-layer memory gradient** that mirrors how human memory actually works , not a flat key-value store, but a hierarchy where important facts rise and trivial ones fade.
 
 ```
 Working memory      session-scoped, full fidelity
       ↓  consolidate after session ends
 Episodic buffer     recent events, lightly filtered, decays over days
       ↓  distill when seen in multiple sessions
-Semantic core       stable facts, preferences, skills — months lifespan
+Semantic core       stable facts, preferences, skills , months lifespan
       ↓  crystallize after repeated reinforcement
 Identity layer      permanent: name, role, core values, communication style
 ```
@@ -40,9 +40,9 @@ Identity layer      permanent: name, role, core values, communication style
 
 **Three-gate write pipeline** prevents the store from filling with noise:
 
-1. **Novelty gate** — cosine similarity check against existing memories. Near-duplicates reinforce the existing chunk instead of creating a new one.
-2. **Score gate** — deterministic feature scoring rejects fragments, hedged statements, and transient context.
-3. **Capacity gate** — each layer has a hard cap. When full, the lowest-scoring chunk is evicted before writing.
+1. **Novelty gate** , cosine similarity check against existing memories. Near-duplicates reinforce the existing chunk instead of creating a new one.
+2. **Score gate** , deterministic feature scoring rejects fragments, hedged statements, and transient context.
+3. **Capacity gate** , each layer has a hard cap. When full, the lowest-scoring chunk is evicted before writing.
 
 **Contextual Resonance Retrieval (CRR)** replaces cosine-only search with four signals fused per query: semantic affinity (including source context), temporal frame matching, type resonance (goal queries boost goal-type memories), and reinforcement history. Results are diversified with Maximal Marginal Relevance to eliminate near-duplicate chunks crowding the top-K.
 
@@ -64,10 +64,10 @@ memory  = CMGMemory(adapter, persist_path="./memory.json")
 
 # Session 1
 memory.chat("I'm a PhD researcher at IISc Bangalore working on XAI for autonomous driving.")
-memory.chat("I always use Grad-CAM. I hate verbose responses — always be concise.")
+memory.chat("I always use Grad-CAM. I hate verbose responses , always be concise.")
 memory.end_session()
 
-# Session 2 — memory persists across restarts
+# Session 2 , memory persists across restarts
 memory.new_session()
 response = memory.chat("What do you know about my work?")
 # recalls IISc, XAI, Grad-CAM, and your preference for concise answers
@@ -78,7 +78,7 @@ response = memory.chat("What do you know about my work?")
 ## Installation
 
 ```bash
-# Core library — no required dependencies
+# Core library , no required dependencies
 pip install cmg-memory
 
 # With your LLM provider
@@ -109,7 +109,7 @@ pip install cmg-memory[all]
 
 ```bash
 ollama serve
-ollama pull llama3.1              # llama3.1 or mistral — better JSON compliance than llama3.2
+ollama pull llama3.1              # llama3.1 or mistral , better JSON compliance than llama3.2
 ollama pull nomic-embed-text      # local embedding model (768 dimensions)
 ```
 
@@ -128,7 +128,7 @@ adapter = create_adapter(
 
 ```python
 adapter = create_adapter("openai", api_key="sk-...", model="gpt-4o")
-# Uses text-embedding-3-small natively — no extra embedding setup needed
+# Uses text-embedding-3-small natively , no extra embedding setup needed
 ```
 
 ### Anthropic Claude
@@ -158,13 +158,13 @@ adapter = create_adapter("huggingface", model="microsoft/phi-2", local=True)
 
 ## Storage backends
 
-### JSON (default — no extra setup)
+### JSON (default , no extra setup)
 
 ```python
 memory = CMGMemory(adapter, persist_path="./memory.json")
 ```
 
-Atomic writes — a crash mid-save cannot corrupt the file. Suitable for personal use on a single machine.
+Atomic writes , a crash mid-save cannot corrupt the file. Suitable for personal use on a single machine.
 
 ### Pinecone (cloud, multi-device sync)
 
@@ -179,13 +179,13 @@ from cmg.store import PineconeVectorStore
 store = PineconeVectorStore(
     api_key       = os.environ["PINECONE_API_KEY"],
     index_name    = "cmg-memory",   # created automatically if it doesn't exist
-    namespace     = "user-rishav",  # one namespace per user — memories never bleed across users
+    namespace     = "user-rishav",  # one namespace per user , memories never bleed across users
     embedding_dim = 768,            # must match your embedding model
 )
 memory = CMGMemory(adapter, store=store)
 ```
 
-The free tier supports up to 100K vectors — sufficient for years of personal use. Layer filters push to Pinecone as metadata filters so latency stays constant regardless of total store size.
+The free tier supports up to 100K vectors , sufficient for years of personal use. Layer filters push to Pinecone as metadata filters so latency stays constant regardless of total store size.
 
 ### ChromaDB (local, production-grade indexing)
 
@@ -211,10 +211,10 @@ PineconeVectorStore.migrate_from(old, new)
 ## CLI
 
 ```bash
-# Interactive chat — JSON store (default)
+# Interactive chat , JSON store (default)
 python run.py
 
-# Interactive chat — Pinecone store
+# Interactive chat , Pinecone store
 python run.py --store pinecone
 
 # Set PINECONE_API_KEY first:
@@ -323,7 +323,7 @@ Consolidation runs automatically at `memory.end_session()` and every 10 turns du
 
 ## Scoring system
 
-CMG uses **Deterministic Feature Scoring (DFS)** — fully model-agnostic. The same message gets the same score regardless of which LLM you're using. Swap from GPT-4o to Ollama and scores are identical.
+CMG uses **Deterministic Feature Scoring (DFS)** , fully model-agnostic. The same message gets the same score regardless of which LLM you're using. Swap from GPT-4o to Ollama and scores are identical.
 
 | Feature | What it measures | Default weight |
 |---|---|---|
@@ -344,12 +344,12 @@ cmg/
 ├── types.py            MemoryChunk, MemoryLayer, MemoryType data classes
 ├── adapters.py         LLM provider adapters (OpenAI, Claude, HuggingFace, Ollama)
 ├── store.py            InMemoryVectorStore · PineconeVectorStore · ChromaVectorStore
-├── scorer.py           Deterministic Feature Scorer — model-agnostic importance scoring
+├── scorer.py           Deterministic Feature Scorer , model-agnostic importance scoring
 ├── extractor.py        Extraction with pre-filter, JSON repair, dedup, normalisation
-├── crr.py              Contextual Resonance Retrieval — four-signal fusion + MMR
+├── crr.py              Contextual Resonance Retrieval , four-signal fusion + MMR
 ├── write_gate.py       Three-gate write pipeline (novelty · score · capacity)
 ├── consolidation.py    Decay · session-based promotion · merge · contradiction detection
-├── memory.py           CMGMemory — unified public interface
+├── memory.py           CMGMemory , unified public interface
 ├── client.py           HTTP client for the hosted API
 └── cli.py              pip-installed entry point
 
@@ -358,7 +358,7 @@ api/
 
 run.py                  Interactive CLI (--store json|pinecone, --mode chat|inspect|...)
 eval.py                 Four-suite evaluation harness
-diagnose.py             Recall failure diagnostic — traces 6 pipeline stages
+diagnose.py             Recall failure diagnostic , traces 6 pipeline stages
 ```
 
 ---
@@ -366,13 +366,13 @@ diagnose.py             Recall failure diagnostic — traces 6 pipeline stages
 ## Evaluation
 
 ```bash
-# Full evaluation — requires Ollama running
+# Full evaluation , requires Ollama running
 python eval.py
 
 # Individual suites
 python eval.py --suite recall        # cross-session fact recall accuracy
 python eval.py --suite staleness     # contradiction + update handling
-python eval.py --suite scoring       # score discrimination (no LLM chat needed — fastest)
+python eval.py --suite scoring       # score discrimination (no LLM chat needed , fastest)
 python eval.py --suite retrieval     # retrieval precision
 
 # Different model
@@ -416,7 +416,7 @@ At the end it prints the root cause and the specific fix.
 
 ## Hosted API
 
-Deploy CMG as a REST API — users get an API key and call endpoints without running anything locally.
+Deploy CMG as a REST API , users get an API key and call endpoints without running anything locally.
 
 ```bash
 # Setup
@@ -428,7 +428,7 @@ uvicorn api.server:app --reload --port 8000
 # 1. Push to GitHub
 # 2. Connect repo on render.com
 # 3. Set PINECONE_API_KEY in Render dashboard
-# 4. Deploy — render.yaml handles the rest
+# 4. Deploy , render.yaml handles the rest
 ```
 
 Interactive API docs at `http://localhost:8000/docs`.
@@ -465,7 +465,7 @@ with CMGClient(api_key="cmg_yourkey", base_url="https://your-api.onrender.com") 
 
 ## CMG Agent
 
-A separate codebase in `cmg_agent/` extends CMG into an autonomous coding agent — file read/write, shell execution, code search, Python REPL — with **decision memory** that logs why every action was taken.
+A separate codebase in `cmg_agent/` extends CMG into an autonomous coding agent , file read/write, shell execution, code search, Python REPL , with **decision memory** that logs why every action was taken.
 
 ```bash
 cd cmg_agent
@@ -547,10 +547,10 @@ memory._retriever = CRREngine(
 
 OpenAI and Anthropic _can_ build what's here. They won't, for structural reasons:
 
-- **Portability** reduces platform lock-in — your memories working on a competitor's model is not in their interest
+- **Portability** reduces platform lock-in , your memories working on a competitor's model is not in their interest
 - **Local-only, zero-telemetry memory** conflicts with a business model that requires data on their servers
 - **Strategic forgetting** means losing data that could improve their models and ad targeting
-- **Cross-agent, cross-session shared memory** commoditises the model layer — the infrastructure becomes more valuable than any individual model
+- **Cross-agent, cross-session shared memory** commoditises the model layer , the infrastructure becomes more valuable than any individual model
 
 CMG is built precisely for these gaps. The library is open source. The store is yours. The model is your choice.
 
