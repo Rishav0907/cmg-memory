@@ -5,7 +5,6 @@
 Works with OpenAI · Anthropic Claude · Ollama · HuggingFace · Pinecone · local JSON
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://python.org)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ---
 
