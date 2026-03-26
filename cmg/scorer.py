@@ -186,6 +186,10 @@ _STABLE_PATTERNS: list[tuple[str, float, str]] = [
     (r"\b(specialise|specialize|expert|expertise)\b",          +0.15, "expertise claim"),
     (r"\b(generally|in\s+general|as\s+a\s+rule)\b",           +0.12, "general habit"),
     (r"\bpermanently\b",                                        +0.20, "permanent"),
+    # Employment and location — stable facts even with "currently"
+    (r"\bwork(ing)?\s+(at|for|in)\s+\w",                     +0.25, "employment fact"),
+    (r"\b(based\s+(in|out\s+of)|living\s+in|located\s+in)\s+\w", +0.25, "location fact"),
+    (r"\bas\s+(a|an)\s+\w+\s+(scientist|engineer|researcher|developer|manager|analyst|designer)", +0.20, "job title"),
 ]
 
 # Transient signals: present progressive, ephemeral time anchors
@@ -202,6 +206,17 @@ _TRANSIENT_PATTERNS: list[tuple[str, float, str]] = [
     (r"\bgoing\s+to\s+(try|attempt|test)\b",                  -0.10, "future trial"),
 ]
 
+# Patterns where "currently" signals a stable state (job, role, location)
+# rather than a transient action (debugging, working on a bug)
+_STABLE_CURRENTLY_PATTERNS = [
+    re.compile(r"currently\s+work(ing)?\s+(at|for|in|as)", re.IGNORECASE),
+    re.compile(r"currently\s+(based|living|located)\s+(in|at|out\s+of)", re.IGNORECASE),
+    re.compile(r"currently\s+(a|an|the)\s+\w+\s+(at|for|in)", re.IGNORECASE),
+    re.compile(r"working\s+at\s+\w", re.IGNORECASE),
+    re.compile(r"(based\s+out\s+of|based\s+in)\s+\w", re.IGNORECASE),
+]
+
+
 def _f2_temporal(content: str, source: str) -> tuple[float, list, list]:
     """
     Compute F2 from temporal vocabulary.
@@ -211,6 +226,10 @@ def _f2_temporal(content: str, source: str) -> tuple[float, list, list]:
     delta = 0.0
     stable_hits, transient_hits = [], []
 
+    # Check if "currently" is used in a stable employment/location context
+    # If so, treat the whole message as stable (skip transient penalty for "currently")
+    is_stable_currently = any(p.search(combined) for p in _STABLE_CURRENTLY_PATTERNS)
+
     for pattern, adj, label in _STABLE_PATTERNS:
         if re.search(pattern, combined, re.IGNORECASE):
             delta += adj
@@ -218,6 +237,11 @@ def _f2_temporal(content: str, source: str) -> tuple[float, list, list]:
 
     for pattern, adj, label in _TRANSIENT_PATTERNS:
         if re.search(pattern, combined, re.IGNORECASE):
+            # Skip the "currently" penalty if it's used in a stable employment context
+            if label == "currently" and is_stable_currently:
+                stable_hits.append("currently (employment context)")
+                delta += 0.15  # treat as stable signal instead
+                continue
             delta += adj
             transient_hits.append(label)
 

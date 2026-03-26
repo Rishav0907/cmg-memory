@@ -36,7 +36,7 @@ from .types import (
 from .store import InMemoryVectorStore, VectorStore, PineconeVectorStore
 from .retrieval import RetrievalEngine
 from .consolidation import ConsolidationEngine
-from .extractor import MemoryExtractor, ScoringResult
+from .extractor import MemoryExtractor
 from .scorer import DeterministicScorer, ScorerWeights, FeatureVector
 from .crr import CRREngine, CRRWeights, ResonanceScore
 from .write_gate import WriteGate, WriteGateStats, GateResult, WriteAction, DEFAULT_LAYER_CAPS

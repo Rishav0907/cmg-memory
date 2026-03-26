@@ -147,6 +147,7 @@ Commands:
   explain <query>       Show CRR retrieval breakdown for a query
   debug on / off        Toggle extraction debug logging
   consolidate           Run decay + merge pass now
+  cleanup               Remove fragment/low-quality memories from old sessions
   clear                 Clear conversation history (keeps memories)
   migrate               Migrate memories to the other store backend
   help                  Show this message
@@ -227,6 +228,24 @@ def run_chat(args: argparse.Namespace) -> None:
             r = memory._consolidator.run(llm_adapter=adapter)
             print(f"  {_g('Done')}  promoted={r.promoted} merged={r.merged} "
                   f"decayed={r.decayed} forgotten={r.forgotten}\n"); continue
+
+        if low == "cleanup":
+            # Remove fragment memories (short content, low quality)
+            all_chunks = memory._store.all_chunks()
+            removed = 0
+            for c in all_chunks:
+                words = len(c.content.split())
+                is_fragment = (
+                    words < 4  # too short
+                    or not c.content.lower().startswith("user")  # not normalised
+                    or c.score < 0.35  # below threshold
+                    or (words < 6 and c.memory_type.value == "generic")  # short generic
+                )
+                if is_fragment:
+                    memory._store.delete(c.id)
+                    removed += 1
+            print(f"  Removed {removed} fragment/low-quality memories.")
+            print(f"  Remaining: {memory._store.count()}\n"); continue
         if low == "stats":
             s = memory.stats()
             print(f"\n  Total   : {s['total_memories']}")

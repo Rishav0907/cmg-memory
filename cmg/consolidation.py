@@ -14,6 +14,7 @@ Runs asynchronously after each session, never in the critical path.
 from __future__ import annotations
 import time
 import math
+import re
 import logging
 from typing import Optional
 
@@ -125,7 +126,7 @@ FAST_TRACK_TYPES = {
 FAST_TRACK_SCORE_THRESHOLD = 0.72  # must be high-confidence to fast-track
 
 FORGETTING_THRESHOLD = 0.05   # Score below this → chunk is deleted
-MERGE_SIMILARITY_THRESHOLD = 0.88  # Cosine similarity above this → candidates for merge
+MERGE_SIMILARITY_THRESHOLD = 0.65  # Cosine similarity above this → candidates for merge
 
 
 
@@ -226,11 +227,13 @@ class ConsolidationEngine:
             sessions_seen = _get_sessions_seen(chunk)
 
             # Fast-track path: high-quality identity facts after just 1 session
+            # Goals use a lower threshold — a stated goal is inherently stable
+            goal_threshold = 0.45 if chunk.memory_type == MemoryType.GOAL else FAST_TRACK_SCORE_THRESHOLD
             fast_track = (
                 chunk.layer == MemoryLayer.EPISODIC
                 and target_layer == MemoryLayer.SEMANTIC
                 and chunk.memory_type in FAST_TRACK_TYPES
-                and chunk.score >= FAST_TRACK_SCORE_THRESHOLD
+                and chunk.score >= goal_threshold
                 and sessions_seen >= 1
             )
 
